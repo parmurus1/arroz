@@ -96,7 +96,10 @@
   <div id="bigText" class="hidden"><div class="bt-cn" id="btCn"></div><div class="bt-pt" id="btPt"></div></div>
 
   <div id="title">
-    <button id="btnChap2" class="t-corner">CAPÍTULO 2 ▶<small>A Vingança do Rei Cobra</small></button>
+    <div class="t-corners">
+      <button id="btnChap2" class="t-corner">CAPÍTULO 2 ▶<small>A Vingança do Rei Cobra</small></button>
+      <button id="btnChap3" class="t-corner">CAPÍTULO 3 ▶<small>A Farofa de Ouro</small></button>
+    </div>
     <div class="t-top">JINLONG SOFT apresenta</div>
     <div class="t-logo">ARROZ<br>DOURADO</div>
     <div class="t-cn">金 米</div>
@@ -153,11 +156,97 @@
   <div id="endTitle" class="hidden"><div class="et-cn">金 & 豆</div><div class="et-pt">KING SIZE & FILHO</div></div>
   <div id="credits" class="hidden"><div id="creditsRoll"></div></div>
   <div id="end2" class="hidden">
-    <div class="e-sub">EM BREVE</div>
-    <div class="e-ks">ARROZ DOURADO 3</div>
+    <div class="e-sub">FIM DO ATO II</div>
+    <div class="e-ks">ATO III</div>
     <div class="e-cn small">A FAROFA DE OURO</div>
     <div class="e-stats" id="e2Stats"></div>
-    <button id="btnAgain2">JOGAR TUDO DE NOVO</button>
+    <button id="btnAct3">▶ COMEÇAR O ATO III</button>
+    <button id="btnAgain2" class="small">jogar tudo de novo</button>
+  </div>
+
+  <!-- ===================== ATO III ===================== -->
+  <div id="a3Card" class="hidden">
+    <div id="a3Num">ATO III</div>
+    <div id="a3Title">A FAROFA DE OURO</div>
+    <div id="a3Sub"></div>
+    <div id="a3Mem"><div class="a3m-lbl">MEMÓRIA DO RIO</div><div class="a3m-bar"><div id="a3MemFill"></div></div><div id="a3MemVal">88%</div></div>
+  </div>
+  <div id="a3Hint" class="hidden"></div>
+
+  <div id="fightHud" class="hidden">
+    <div class="fbar left"><div class="fname" id="fnL"></div><div class="fhp"><div class="ftrail" id="fhTL"></div><div class="ffill" id="fhL"></div></div><div class="fwins" id="fwL"></div></div>
+    <div id="fTimer">60</div>
+    <div class="fbar right"><div class="fname" id="fnR"></div><div class="fhp"><div class="ftrail" id="fhTR"></div><div class="ffill" id="fhR"></div></div><div class="fwins" id="fwR"></div></div>
+    <div class="fmeter left"><div id="fmL"></div><span>SUPER</span></div>
+    <div class="fmeter right"><div id="fmR"></div><span>SUPER</span></div>
+    <div id="fightTitle"></div>
+    <div id="fightBig"></div>
+    <div id="fightKeys">A/D anda · W pula · S agacha · J soco · K chute · ↓↘→+J (ou L) arroz-dōken · →↓↘+J (ou S+L) uppercut · J+K (ou I) SUPER · segure pra trás pra defender</div>
+  </div>
+  <div id="charSelect" class="hidden">
+    <div class="cs-title" id="csTitle"></div>
+    <div class="cs-vs" id="csVs"></div>
+    <div class="cs-row">
+      <button data-f="jinlong"><b>1 · JINLONG</b><small>Equilibrado. Arroz-dōken e Dragão-ryūken.</small></button>
+      <button data-f="son"><b>2 · XIAO DOU</b><small>Rápido. Feijão-dōken e Tornado de Feijoada.</small></button>
+    </div>
+  </div>
+
+  <div id="horrorHud" class="hidden">
+    <div id="hZone"></div>
+    <div id="hStatus"><div id="hEcg"></div><div><div id="hCond">BEM</div><div id="hAmmo"></div></div></div>
+    <div id="hInteract" class="hidden"></div>
+    <div id="hKeys">W/S anda · A/D gira · SHIFT corre · segure K mira · J atira · E interage · I inventário</div>
+  </div>
+  <div id="invBox" class="hidden">
+    <div class="inv-panel panel">
+      <div class="inv-head">INVENTÁRIO</div>
+      <div id="invStatus"></div>
+      <div id="invList"></div>
+      <div class="inv-btns"><button id="invCombine" class="hidden">🌿+🌶 MISTURAR</button><button id="invClose">FECHAR (I)</button></div>
+    </div>
+  </div>
+  <div id="safeBox" class="hidden">
+    <div class="safe-panel">
+      <div id="safeDisp">----</div>
+      <div class="safe-keys">
+        <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+        <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+        <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+        <button data-k="C">C</button><button data-k="0">0</button><button data-k="OK">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="kartHud" class="hidden">
+    <div id="kTrack"></div>
+    <div id="kPos">1º</div>
+    <div id="kItem"></div>
+    <div id="kInfo"><div id="kClock">23:15</div><div id="kSpeed"></div><div id="kDrift"></div></div>
+    <div id="kBarWrap"><span>JOÁ</span><div id="kBar"></div><span>🏁</span></div>
+    <div id="kCount"></div>
+    <div id="kDust"></div>
+    <div id="kPombo" class="hidden">🐦</div>
+  </div>
+
+  <div id="rhythmHud" class="hidden">
+    <div id="rSong"></div>
+    <div id="rScoreBox"><div id="rScore">0</div><div id="rMult">×1</div><div id="rCombo"></div></div>
+    <div id="rMemBox"><div id="rMemLbl"></div><div class="rmem"><div id="rMemFill"></div><div id="rNeed"></div></div></div>
+    <div id="rKS"><span>👑 KING SIZE</span><div class="rks"><div id="rKSFill"></div></div><b id="rKSHint"></b></div>
+    <div id="rProgWrap"><div id="rProg"></div></div>
+    <div id="rJudge"></div>
+    <div id="rAttack"></div>
+    <div id="rCount"></div>
+    <div id="rKeys">D · F · J · K &nbsp;(ou 1 2 3 4) &nbsp;·&nbsp; ESPAÇO = MODO KING SIZE</div>
+  </div>
+
+  <div id="end3" class="hidden">
+    <div class="e-cn">金 豆 梅</div>
+    <div class="e-ks">FIM</div>
+    <div class="e-sub">ARROZ DOURADO · A TRILOGIA</div>
+    <div class="e-stats">Obrigado por lembrar.</div>
+    <button id="btnAgain3">JOGAR TUDO DE NOVO</button>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -167,6 +256,13 @@
   <script src="js/world.js"></script>
   <script src="js/act2-models.js"></script>
   <script src="js/act2.js"></script>
+  <script src="js/act3-data.js"></script>
+  <script src="js/act3-core.js"></script>
+  <script src="js/act3-fight.js"></script>
+  <script src="js/act3-horror.js"></script>
+  <script src="js/act3-kart.js"></script>
+  <script src="js/act3-rhythm.js"></script>
+  <script src="js/act3.js"></script>
   <script src="js/game.js"></script>
 </body>
 </html>

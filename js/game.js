@@ -581,6 +581,7 @@
 
   function continueGame() {
     if (!load()) return newGame();
+    if (S.flags.act2Done) return startAct3();
     if (S.flags.act1Done) return startAct2();
     applyStateToWorld();
     $('#title').classList.add('hidden');
@@ -718,6 +719,15 @@
     Act2.start(S.act2 || { stage: 'balsa1' });
   }
 
+  function startAct3() {
+    Sfx.init();
+    Sfx.drone(false); Sfx.radio(false); Sfx.ring(false); Sfx.rain(0); Sfx.music(null);
+    ['#ending', '#end2', '#title', '#hud', '#hud2'].forEach((s) => $(s).classList.add('hidden'));
+    S.flags.act1Done = true; S.flags.act2Done = true;
+    phase = 'act3';
+    Act3.start(S.act3 || { stage: 'prologo' });
+  }
+
   // ---------------------------------------------------------------
   // save (memory card)
   // ---------------------------------------------------------------
@@ -808,6 +818,13 @@
   $('#btnAgain').addEventListener('click', () => { clearSave(); location.reload(); });
   $('#btnAct2').addEventListener('click', startAct2);
   // atalho do menu: começa o capítulo 2 do início, mantendo o resto do save
+  $('#btnChap3').addEventListener('click', () => {
+    load();
+    S.act3 = { stage: 'prologo' };
+    startAct3();
+  });
+  $('#btnAct3').addEventListener('click', startAct3);
+  $('#btnAgain3').addEventListener('click', () => { clearSave(); location.reload(); });
   $('#btnChap2').addEventListener('click', () => {
     load();
     S.flags.act1Done = true;
@@ -873,6 +890,13 @@
       requestAnimationFrame(frame);
       return;
     }
+    if (Act3.isActive()) {
+      updateDialog(dt);
+      Act3.update(dt);
+      Act3.render();
+      requestAnimationFrame(frame);
+      return;
+    }
     update(dt);
     const tapeReady = S.tapes.some((x) => !x.heard);
     World.update(dt, { auto: phase === 'play' && gps() > 0, tapeReady });
@@ -896,9 +920,9 @@
   World.init(canvas);
   if (hasSave()) {
     $('#btnCont').classList.remove('hidden');
-    let act2 = false;
-    try { act2 = !!JSON.parse(localStorage.getItem(SAVE_KEY)).flags.act1Done; } catch (e) { /* save antigo */ }
-    $('#memCard').textContent = act2 ? 'MEMORY CARD (8MB) no SLOT 1: "ARROZ DOURADO" — ATO II' : 'MEMORY CARD (8MB) no SLOT 1: "ARROZ DOURADO" — 1 save encontrado';
+    let act = 'I';
+    try { const f = JSON.parse(localStorage.getItem(SAVE_KEY)).flags; act = f.act2Done ? 'III' : f.act1Done ? 'II' : 'I'; } catch (e) { /* save antigo */ }
+    $('#memCard').textContent = `MEMORY CARD (8MB) no SLOT 1: "ARROZ DOURADO" — ATO ${act}`;
   }
   requestAnimationFrame(frame);
   if (DEBUG) {
@@ -907,5 +931,8 @@
     // ?debug&act2=balsa1|mansion|boss1|post1|boss2|final pula direto pra uma parte do ato II
     const m = location.search.match(/act2=(\w+)/);
     if (m) { S.flags.act1Done = true; S.act2 = { stage: m[1] }; startAct2(); }
+    // ?debug&act3=prologo|treino|torneio|joa|corrida|reveillon|final (+ &n=índice da luta/trecho/música)
+    const m3 = location.search.match(/act3=(\w+)/), n3 = location.search.match(/[?&]n=(\d+)/);
+    if (m3) { const i = n3 ? +n3[1] : 0; S.act3 = { stage: m3[1], fightIdx: i, raceIdx: i, songIdx: i }; startAct3(); }
   }
 })();

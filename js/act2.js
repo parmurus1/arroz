@@ -1413,7 +1413,11 @@ const Act2 = (() => {
     $('#e2Stats').innerHTML = `Tempo na mansão: ${m}min ${String(s).padStart(2, '0')}s<br>Capangas derrubados: ${st.kills}<br>Arma final: ${D2.WEAPONS[st.owned - 1].name}`;
     $('#end2').classList.remove('hidden');
     $('#fade').classList.remove('on', 'white');
-    UI.clearSave();
+    // o ato II acabou: o save passa a apontar pro ato III
+    const S = UI.S();
+    S.flags.act2Done = true;
+    S.act3 = { stage: 'prologo' };
+    UI.save();
     isActive = false;
   }
 

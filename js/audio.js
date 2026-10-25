@@ -405,7 +405,7 @@ const Sfx = (() => {
     if (!name) return;
     musBus = ctx.createGain(); musBus.gain.value = 0.55; musBus.connect(master);
     const bus = musBus;
-    const bpm = { metal: 132, boss: 168, jingle: 140, sad: 72, sea: 60 }[name];
+    const bpm = { metal: 132, boss: 168, jingle: 140, sad: 72, sea: 60, fight: 150, samba: 100, horror: 60, safe: 84, kart: 156 }[name];
     const step = 60 / bpm / 4;
     musStep = 0; musNext = now() + 0.1;
     let seaSrc = null;
@@ -449,6 +449,42 @@ const Sfx = (() => {
           if (m && bar >= 2) tone(m, step * 3, 'sine', 0.06, bus, t);
         } else if (name === 'sea') {
           if (musStep % 64 === 0 && Math.random() < 0.6) tone(1800 + Math.random() * 400, 0.2, 'sine', 0.02, bus, t, 1400); // gaivota
+        } else if (name === 'fight') {
+          // tema de luta estilo arcade: baixo andando + lead pentatônico
+          const root = [0, 0, 5, 3][bar % 4];
+          const B = [0, 12, 0, 10, 0, 7, 0, 10, 0, 12, 0, 10, 3, 5, 7, 10];
+          tone(E2 * Math.pow(2, (B[s] + root) / 12), step * 0.9, 'square', 0.07, bus, t);
+          if (s % 4 === 0) tone(60, 0.12, 'sine', 0.55, bus, t, 40);
+          if (s % 8 === 4) noiseHit(2000, 0.8, 0.12, 0.3, bus, t);
+          if (s % 2 === 1) noiseHit(9000, 1, 0.02, 0.06, bus, t, 'highpass');
+          const L = [12, 0, 15, 0, 17, 15, 12, 0, 10, 0, 12, 0, 7, 0, 10, 0];
+          if (bar % 8 >= 4 && L[s]) tone(E2 * 4 * Math.pow(2, (L[s] + root) / 12), step * 1.6, 'square', 0.035, bus, t);
+        } else if (name === 'samba') {
+          // roda de samba da Lapa (torcida)
+          if (s === 0 || s === 8) tone(58, 0.4, 'sine', 0.45, bus, t, 45);
+          noiseHit(7000, 1.5, 0.03, s % 4 === 0 ? 0.2 : 0.08, bus, t, 'highpass');
+          if (CAV[s]) CHORDS[bar % 4].forEach((f, i) => tone(f * 2, 0.12, 'triangle', 0.03, bus, t + i * 0.008));
+          if (TAM[s]) tone(880, 0.04, 'square', 0.05, bus, t);
+        } else if (name === 'horror') {
+          // drone, rangidos e um coração ao longe
+          if (s === 0 && bar % 2 === 0) [55, 58.3, 82.4].forEach((f) => tone(f, step * 32, 'sawtooth', 0.025, bus, t));
+          if (s === 0 || s === 3) tone(48, 0.18, 'sine', 0.25, bus, t, 35);
+          if (Math.random() < 0.012) noiseHit(300 + Math.random() * 600, 8, 0.6, 0.06, bus, t);
+          if (Math.random() < 0.006) tone(900 + Math.random() * 900, 1.2, 'sine', 0.015, bus, t, 600);
+        } else if (name === 'safe') {
+          // sala segura: pagodinho baixinho no radinho
+          if (s === 0 || s === 8) tone(65, 0.3, 'sine', 0.2, bus, t, 50);
+          if (CAV[s]) CHORDS[bar % 4].forEach((f, i) => tone(f * 2, 0.15, 'triangle', 0.02, bus, t + i * 0.01));
+          noiseHit(6000, 1.5, 0.03, 0.04, bus, t, 'highpass');
+        } else if (name === 'kart') {
+          // samba-rock acelerado pra corrida
+          if (s % 4 === 0) tone(58, 0.14, 'sine', 0.6, bus, t, 42);
+          if (s === 4 || s === 12) { noiseHit(1800, 0.8, 0.12, 0.3, bus, t); }
+          noiseHit(8000, 1.2, 0.02, s % 2 ? 0.05 : 0.1, bus, t, 'highpass');
+          if ([0, 3, 6, 10, 12].includes(s)) tone(1200 + (s % 2) * 400, 0.06, 'square', 0.04, bus, t); // agogô
+          const bass = [0, 0, 7, 0, 10, 0, 7, 5][Math.floor(s / 2)] + [0, 5, 7, 3][bar % 4];
+          if (s % 2 === 0) tone(E2 * Math.pow(2, bass / 12), step * 1.6, 'sawtooth', 0.05, bus, t);
+          if (bar % 4 >= 2 && s % 4 === 2) CHORDS[bar % 4].forEach((f) => tone(f * 2, 0.1, 'square', 0.015, bus, t));
         }
         musNext += step; musStep++;
       }
@@ -465,5 +501,7 @@ const Sfx = (() => {
     init, tick, black, buy, error, sackDrop, tapeFound, tapeClick, whatsapp, itemFound, fake, blip, gold, gong,
     ring, rain, radio, drone, speakChinese, stopSpeech, setMuted, isMuted: () => muted, hasZh: () => !!zhVoice(),
     boom, shoot, whistle, hurt, enemyHurt, enemyDie, pickup, keyGet, door, ksOn, roar, jump, tvStatic, drumroll, crowd, firework, music,
+    // acesso direto pro Ato III (jogo de ritmo agenda notas no relógio do áudio)
+    raw: { ctx: () => ctx, now: () => (ctx ? ctx.currentTime : 0), tone, noiseHit, noiseSrc, dist, master: () => master, sfx: () => sfxBus },
   };
 })();
