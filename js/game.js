@@ -807,6 +807,13 @@
   $('#btnCont').addEventListener('click', () => { Sfx.init(); continueGame(); });
   $('#btnAgain').addEventListener('click', () => { clearSave(); location.reload(); });
   $('#btnAct2').addEventListener('click', startAct2);
+  // atalho do menu: começa o capítulo 2 do início, mantendo o resto do save
+  $('#btnChap2').addEventListener('click', () => {
+    load();
+    S.flags.act1Done = true;
+    S.act2 = { stage: 'balsa1' };
+    startAct2();
+  });
   $('#muteBtn').addEventListener('click', toggleMute);
   $('#btnTapes').addEventListener('click', () => { $('#leftCol').classList.toggle('open'); $('#shop').classList.remove('open'); $('#btnTapes').classList.remove('flash'); });
   $('#btnShop').addEventListener('click', () => { $('#shop').classList.toggle('open'); $('#leftCol').classList.remove('open'); });

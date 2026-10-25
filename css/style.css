@@ -147,6 +147,9 @@ button { font-family: 'VT323', monospace; }
 .t-menu button { font-family: 'Press Start 2P', monospace; font-size: 14px; padding: 10px 26px; }
 .t-press { margin-top: 20px; font-family: 'Press Start 2P', monospace; font-size: 11px; animation: blink 1s steps(2) infinite; }
 .t-card { margin-top: 14px; color: var(--dim); font-size: 18px; }
+.t-corner { position: absolute; top: max(14px, env(safe-area-inset-top, 0px)); right: max(14px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; align-items: flex-end; gap: 2px; cursor: pointer; font-family: 'VT323', monospace; font-size: 26px; line-height: 1; padding: 6px 12px; color: var(--gold); border: 2px solid var(--gold-d); background: linear-gradient(180deg, #5a1a14, #2a0a08); text-shadow: 2px 2px 0 #000; }
+.t-corner small { font-family: 'VT323', monospace; font-size: 16px; color: var(--dim); }
+.t-corner:hover, .t-corner:focus-visible { border-color: var(--gold); box-shadow: 0 0 14px rgba(242, 196, 67, 0.5); outline: none; }
 .t-foot { position: absolute; bottom: 12px; color: #6a5a4a; font-size: 16px; }
 
 #ending { position: fixed; inset: 0; z-index: 45; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; animation: fadeIn 3s; }
