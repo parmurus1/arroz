@@ -302,6 +302,159 @@ const Sfx = (() => {
     stopHiss();
   }
 
+  // =================================================================
+  //  ATO II — armas, porrada e trilha
+  // =================================================================
+  let distCurve = null;
+  function dist() {
+    if (!distCurve) {
+      distCurve = new Float32Array(1024);
+      for (let i = 0; i < 1024; i++) { const x = i / 512 - 1; distCurve[i] = Math.tanh(x * 6); }
+    }
+    const w = ctx.createWaveShaper(); w.curve = distCurve; return w;
+  }
+  function boom(size) {
+    if (!ctx) return;
+    const t = now();
+    tone(70 * (1 / size + 0.5), 0.6 * size, 'sine', 0.7, null, t, 30);
+    noiseHit(600, 0.6, 0.7 * size, 0.6, null, t, 'lowpass');
+    noiseHit(2500, 1, 0.25, 0.25, null, t);
+  }
+  function shoot(id) {
+    if (!ctx) return;
+    const t = now();
+    if (id === 'mao') { noiseHit(5000, 1.5, 0.12, 0.15, null, t, 'highpass'); for (let i = 0; i < 4; i++) noiseHit(4000 + Math.random() * 3000, 8, 0.03, 0.08, null, t + 0.05 + Math.random() * 0.1); }
+    else if (id === 'estilingue') { tone(500, 0.12, 'triangle', 0.15, null, t, 120); noiseHit(3000, 3, 0.05, 0.15, null, t); }
+    else if (id === 'doze') { noiseHit(900, 0.7, 0.35, 0.6, null, t, 'lowpass'); tone(110, 0.2, 'square', 0.25, null, t, 50); noiseHit(5000, 2, 0.08, 0.3, null, t + 0.25); }
+    else if (id === 'matic') { noiseHit(1800, 1.2, 0.06, 0.3, null, t); tone(160, 0.05, 'square', 0.12, null, t, 80); }
+    else if (id === 'bazuca') { tone(90, 0.4, 'sawtooth', 0.3, null, t, 40); noiseHit(1500, 1, 0.5, 0.35, null, t, 'bandpass'); }
+    else if (id === 'panela') { noiseHit(2200, 1.5, 0.04, 0.22, null, t); tone(130, 0.04, 'square', 0.1, null, t, 70); }
+    else if (id === 'punch') { tone(80, 0.18, 'sine', 0.7, null, t, 40); noiseHit(1200, 1, 0.12, 0.5, null, t, 'lowpass'); noiseHit(3500, 2, 0.05, 0.3, null, t); }
+    else if (id === 'whiff') { noiseHit(1500, 1, 0.15, 0.15, null, t, 'bandpass'); }
+  }
+  let whistleNode = null;
+  function whistle(on) {
+    if (!ctx) return;
+    if (on && !whistleNode) {
+      const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = 2100;
+      const v = ctx.createOscillator(); v.frequency.value = 7; const vg = ctx.createGain(); vg.gain.value = 60; v.connect(vg); vg.connect(o.frequency);
+      const g = ctx.createGain(); g.gain.value = 0; g.gain.setTargetAtTime(0.05, now(), 0.05);
+      const n = noiseSrc(true); const nf = ctx.createBiquadFilter(); nf.type = 'highpass'; nf.frequency.value = 6000; const ng = ctx.createGain(); ng.gain.value = 0.25;
+      n.connect(nf); nf.connect(ng); ng.connect(g);
+      o.connect(g); g.connect(sfxBus); o.start(); v.start(); n.start();
+      whistleNode = { o, v, n, g };
+    } else if (!on && whistleNode) {
+      const w = whistleNode; whistleNode = null;
+      w.g.gain.setTargetAtTime(0, now(), 0.08);
+      setTimeout(() => { w.o.stop(); w.v.stop(); w.n.stop(); }, 400);
+    }
+  }
+  function hurt() { if (!ctx) return; tone(140, 0.2, 'sawtooth', 0.2, null, null, 70); noiseHit(800, 1, 0.12, 0.2, null, null, 'lowpass'); }
+  function enemyHurt() { if (!ctx) return; tone(300 + Math.random() * 100, 0.06, 'square', 0.05, null, null, 200); }
+  function enemyDie(big) {
+    if (!ctx) return;
+    const t = now();
+    const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(big ? 160 : 260, t); o.frequency.exponentialRampToValueAtTime(big ? 50 : 90, t + 0.5);
+    const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 700; f.Q.value = 2;
+    const g = ctx.createGain(); env(g, t, 0.01, 0.3, 0.5);
+    o.connect(f); f.connect(g); g.connect(sfxBus); o.start(t); o.stop(t + 0.6);
+  }
+  function pickup() { if (!ctx) return; tone(988, 0.08, 'square', 0.08); tone(1319, 0.14, 'square', 0.08, null, now() + 0.07); }
+  function keyGet() { if (!ctx) return; const t = now(); [523, 659, 784, 1046, 1318].forEach((f, i) => tone(f, 0.3, 'square', 0.08, null, t + i * 0.08)); }
+  function door() { if (!ctx) return; tone(55, 1.6, 'sawtooth', 0.25, null, null, 40); noiseHit(300, 0.8, 1.6, 0.3, null, null, 'lowpass'); }
+  function ksOn() {
+    if (!ctx) return;
+    const t = now();
+    gong();
+    [220, 277, 330, 440, 554].forEach((f) => tone(f, 2.2, 'sawtooth', 0.05, null, t + 0.05));
+    tone(110, 1.2, 'sawtooth', 0.15, null, t, 880);
+  }
+  function roar() { if (!ctx) return; tone(70, 1.2, 'sawtooth', 0.35, null, null, 45); noiseHit(400, 0.7, 1.2, 0.4, null, null, 'lowpass'); }
+  function jump() { tone(300, 0.08, 'triangle', 0.05, null, null, 500); }
+  function tvStatic(dur) { if (!ctx) return; noiseHit(4000, 0.3, dur || 0.6, 0.35, null, null, 'highpass'); }
+  function drumroll(dur) {
+    if (!ctx) return;
+    const t = now();
+    for (let i = 0; i < dur * 22; i++) noiseHit(1800, 1, 0.05, 0.1 + i / (dur * 22) * 0.2, null, t + i / 22);
+    tone(90, 0.5, 'sine', 0.6, null, t + dur, 50); noiseHit(5000, 0.8, 1.2, 0.35, null, t + dur, 'highpass');
+  }
+  function crowd(dur, excite) {
+    if (!ctx) return;
+    const t = now(), d = dur || 2;
+    const n = noiseSrc(true);
+    const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 900; f.Q.value = 0.5;
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(excite ? 0.35 : 0.18, t + 0.3); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    n.connect(f); f.connect(g); g.connect(sfxBus); n.start(t); n.stop(t + d + 0.1);
+    if (excite) for (let i = 0; i < 10; i++) tone(500 + Math.random() * 600, 0.3, 'triangle', 0.02, null, t + Math.random() * d);
+  }
+  function firework() { if (!ctx) return; const t = now(); tone(900, 0.5, 'sine', 0.05, null, t, 2000); boom(0.7); for (let i = 0; i < 12; i++) noiseHit(6000, 3, 0.03, 0.08, null, t + 0.1 + Math.random() * 0.8); }
+
+  // ---------------- trilhas do Ato II ----------------
+  let musTimer = null, musName = null, musStep = 0, musNext = 0, musBus = null;
+  const E2 = 82.41;
+  const RIFF = [0, 0, -1, 0, 0, -1, 3, 0, 0, 0, -1, 0, 6, 5, 3, 1]; // semitons (−1 = pausa)
+  const RIFF_B = [0, 0, 12, 0, 10, 0, 7, 0, 0, 0, 12, 0, 6, 7, 6, 3];
+  const SAD = [[220, 261.6, 329.6], [174.6, 220, 261.6], [261.6, 329.6, 392], [196, 246.9, 293.7]]; // Am F C G
+  const SAD_MEL = [659, 0, 587, 523, 0, 440, 523, 0, 587, 0, 659, 784, 0, 659, 587, 0];
+  function music(name) {
+    if (!ctx) return;
+    if (musName === name) return;
+    if (musTimer) { clearInterval(musTimer); musTimer = null; }
+    if (musBus) { const b = musBus; b.gain.setTargetAtTime(0, now(), 0.3); setTimeout(() => b.disconnect(), 1500); musBus = null; }
+    musName = name;
+    if (!name) return;
+    musBus = ctx.createGain(); musBus.gain.value = 0.55; musBus.connect(master);
+    const bus = musBus;
+    const bpm = { metal: 132, boss: 168, jingle: 140, sad: 72, sea: 60 }[name];
+    const step = 60 / bpm / 4;
+    musStep = 0; musNext = now() + 0.1;
+    let seaSrc = null;
+    if (name === 'sea') {
+      seaSrc = noiseSrc(true);
+      const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 500;
+      const g = ctx.createGain(); g.gain.value = 0.12;
+      const lfo = ctx.createOscillator(); lfo.frequency.value = 0.13; const lg = ctx.createGain(); lg.gain.value = 0.08; lfo.connect(lg); lg.connect(g.gain);
+      seaSrc.connect(f); f.connect(g); g.connect(bus); seaSrc.start(); lfo.start();
+      const eng = ctx.createOscillator(); eng.type = 'sawtooth'; eng.frequency.value = 38; const ef = ctx.createBiquadFilter(); ef.type = 'lowpass'; ef.frequency.value = 120; const eg = ctx.createGain(); eg.gain.value = 0.06;
+      eng.connect(ef); ef.connect(eg); eg.connect(bus); eng.start();
+    }
+    const guitar = (freq, t, len, vol) => {
+      [1, 1.5].forEach((k) => {
+        const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = freq * k;
+        const d = dist(); const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2200;
+        const g = ctx.createGain(); env(g, t, 0.005, vol, len);
+        o.connect(d); d.connect(lp); lp.connect(g); g.connect(bus); o.start(t); o.stop(t + len + 0.05);
+      });
+    };
+    musTimer = setInterval(() => {
+      while (musNext < now() + 0.2) {
+        const s = musStep % 16, bar = Math.floor(musStep / 16), t = musNext;
+        if (name === 'metal' || name === 'boss') {
+          const riff = name === 'boss' && bar % 4 >= 2 ? RIFF_B : RIFF;
+          if (s % 4 === 0 || (name === 'boss' && s % 2 === 0) || s === 14) tone(55, 0.15, 'sine', 0.7, bus, t, 35);
+          if (s === 4 || s === 12) { noiseHit(1800, 0.8, 0.15, 0.4, bus, t); tone(190, 0.08, 'triangle', 0.15, bus, t, 120); }
+          if (s % 2 === 0) noiseHit(8000, 1, 0.03, 0.08, bus, t, 'highpass');
+          const n = riff[s];
+          if (n >= 0) guitar(E2 * Math.pow(2, n / 12) * (name === 'boss' && bar % 8 >= 4 ? 2 : 1), t, step * 0.9, 0.07);
+        } else if (name === 'jingle') {
+          const C = [523, 659, 784, 1046, 784, 659, 523, 659, 698, 880, 1046, 880, 784, 988, 1175, 988];
+          tone(C[s], step * 0.8, 'square', 0.05, bus, t);
+          if (s % 4 === 0) tone(130.8 * (bar % 2 ? 1.33 : 1), 0.2, 'triangle', 0.2, bus, t);
+          if (s % 4 === 2) noiseHit(2000, 1, 0.08, 0.15, bus, t);
+        } else if (name === 'sad') {
+          const ch = SAD[bar % 4];
+          if (s === 0) ch.forEach((f) => tone(f / 2, step * 16, 'sine', 0.05, bus, t));
+          tone(ch[s % 3] * (s % 6 < 3 ? 1 : 2), step * 3, 'triangle', 0.05, bus, t);
+          const m = SAD_MEL[s];
+          if (m && bar >= 2) tone(m, step * 3, 'sine', 0.06, bus, t);
+        } else if (name === 'sea') {
+          if (musStep % 64 === 0 && Math.random() < 0.6) tone(1800 + Math.random() * 400, 0.2, 'sine', 0.02, bus, t, 1400); // gaivota
+        }
+        musNext += step; musStep++;
+      }
+    }, 40);
+  }
+
   function setMuted(m) {
     muted = m;
     if (master) master.gain.setTargetAtTime(m ? 0 : 0.6, now(), 0.05);
@@ -311,5 +464,6 @@ const Sfx = (() => {
   return {
     init, tick, black, buy, error, sackDrop, tapeFound, tapeClick, whatsapp, itemFound, fake, blip, gold, gong,
     ring, rain, radio, drone, speakChinese, stopSpeech, setMuted, isMuted: () => muted, hasZh: () => !!zhVoice(),
+    boom, shoot, whistle, hurt, enemyHurt, enemyDie, pickup, keyGet, door, ksOn, roar, jump, tvStatic, drumroll, crowd, firework, music,
   };
 })();

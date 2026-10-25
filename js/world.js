@@ -1074,7 +1074,17 @@ const World = (() => {
     renderer.render(postScene, postCam);
   }
 
+  // o Ato II usa o mesmo renderizador e o mesmo pós-processamento PS2
+  function renderWith(sc, cm) {
+    renderer.setRenderTarget(rt);
+    renderer.render(sc, cm);
+    renderer.setRenderTarget(null);
+    renderer.render(postScene, postCam);
+  }
+  const kit = { lam, basic, psx, canvasTex, textCanvas, box, cyl, rng, pixels, noisy, TEX, labelTex, skyAt, lerpC, hex };
+
   return {
+    kit, renderWith,
     init, update, render, pick, look: look_, setPile, setSackFrac, newSack, countFx, setStream, setTool, setHelpers,
     setTime, setRinging, setPlaying, setFlicker, setFade, setTint, setGray, flash, shake: shakeIt, goldenReveal, goldToHand, endingTurn,
     burstSparks: () => burst(O.sparks, new THREE.Vector3(-0.05, O.TY + 0.2, 0.12), 1.2, 1.5),

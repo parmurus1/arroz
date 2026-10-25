@@ -60,7 +60,6 @@
       <div id="shopList"></div>
     </div>
 
-    <div id="toasts"></div>
     <div id="hint"></div>
     <button id="sleepBtn" class="hidden">🛏 DORMIR NO QUARTINHO DOS FUNDOS</button>
     <div id="ticker"><div id="tickerLbl">📰 JORNAL DE ONTEM</div><div id="tickerWrap"><span id="tickerText"></span></div></div>
@@ -113,16 +112,60 @@
   <div id="ending" class="hidden">
     <div class="e-cn">黄金龙</div>
     <div class="e-ks">KING SIZE</div>
-    <div class="e-sub">O REI DE TODOS OS REIS</div>
+    <div class="e-sub">FIM DO ATO I</div>
     <div class="e-stats" id="eStats"></div>
-    <div class="e-next">CONTINUA EM...<br><b>ARROZ DOURADO 2: A VINGANÇA DO REI COBRA</b></div>
-    <button id="btnAgain">JOGAR DE NOVO</button>
+    <div class="e-next">E agora... a vingança.</div>
+    <button id="btnAct2">▶ ATO II: A VINGANÇA DO REI COBRA</button>
+    <button id="btnAgain" class="small">jogar o ato I de novo</button>
+  </div>
+
+  <!-- ===================== ATO II ===================== -->
+  <div id="toasts"></div>
+  <div id="hud2" class="hidden">
+    <div id="cross"></div>
+    <div id="bossBar" class="hidden"><div id="bossName"></div><div class="bbar"><div id="bossFill"></div></div></div>
+    <div id="zoneName"></div>
+    <div id="statusBar">
+      <div class="sb"><div class="sbl">VIDA</div><div class="sbv" id="hpVal">100%</div></div>
+      <div class="sb wide"><div class="sbl" id="wName">PUNHADO DE ARROZ</div><div class="sbv" id="ammoVal">∞</div></div>
+      <canvas id="face" width="32" height="32"></canvas>
+      <div class="sb wide"><div class="sbl">KING SIZE · <span id="ksHint">0%</span></div><div class="ksbar"><div id="ksFill"></div></div></div>
+      <div class="sb"><div class="sbl">CHAVES</div><div class="keys"><span id="key1" class="key k1"></span><span id="key2" class="key k2"></span><span id="key3" class="key k3"></span></div></div>
+      <div class="sb"><div class="sbl">GRANA</div><div class="sbv gold" id="moneyVal">R$ 0</div></div>
+    </div>
+  </div>
+  <div id="hurtFlash"></div>
+  <div id="ksAura"></div>
+  <div id="shop2" class="hidden">
+    <div class="s2-box panel">
+      <div class="s2-head">💬 ZAP DO TIO KWAN <small>o motoboy entrega na mansão</small></div>
+      <div id="shop2List"></div>
+      <button id="shop2Close">FECHAR (B)</button>
+    </div>
+  </div>
+  <div id="pause2" class="hidden"><div>PAUSADO</div><small>clique pra voltar</small></div>
+  <div id="dead2" class="hidden"><div class="d-big">VOCÊ MORREU</div><small>O arroz esfriou. Clique pra tentar de novo.</small></div>
+  <div id="letterbox"><div class="lb top"></div><div class="lb bot"></div></div>
+  <div id="mash" class="hidden"><div class="mash-title">SOCA ELE JUNTO!<br><small>APERTE ESPAÇO / CLIQUE SEM PARAR</small></div><div class="mash-bar"><div id="mashFill"></div></div></div>
+  <div id="tvStatic" class="hidden"></div>
+  <div id="tvOverlay" class="hidden"><div class="tv-live">● AO VIVO</div><div class="tv-logo">PROGRAMA<br>DO RATÃO</div><div id="tvLower"></div></div>
+  <div id="endTitle" class="hidden"><div class="et-cn">金 & 豆</div><div class="et-pt">KING SIZE & FILHO</div></div>
+  <div id="credits" class="hidden"><div id="creditsRoll"></div></div>
+  <div id="end2" class="hidden">
+    <div class="e-sub">EM BREVE</div>
+    <div class="e-ks">ARROZ DOURADO 3</div>
+    <div class="e-cn small">A FAROFA DE OURO</div>
+    <div class="e-stats" id="e2Stats"></div>
+    <button id="btnAgain2">JOGAR TUDO DE NOVO</button>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="js/data.js"></script>
+  <script src="js/act2-data.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/world.js"></script>
+  <script src="js/act2-models.js"></script>
+  <script src="js/act2.js"></script>
   <script src="js/game.js"></script>
 </body>
 </html>

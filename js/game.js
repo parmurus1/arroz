@@ -581,6 +581,7 @@
 
   function continueGame() {
     if (!load()) return newGame();
+    if (S.flags.act1Done) return startAct2();
     applyStateToWorld();
     $('#title').classList.add('hidden');
     $('#hud').classList.remove('hidden');
@@ -696,12 +697,25 @@
   }
 
   function showEnding() {
+    // o ato I acabou: guarda o progresso pro ato II
+    S.flags.act1Done = true;
+    S.act2 = { stage: 'balsa1' };
+    save();
     phase = 'ending';
     const m = Math.floor(S.playTime / 60), s = Math.floor(S.playTime % 60);
     $('#eStats').innerHTML = `Tempo de jogo: ${m}min ${String(s).padStart(2, '0')}s<br>Grãos contados: ${fmt(S.grains)}<br>Cliques: ${fmt(S.clicks)} · Grãos pretos: ${S.blacks}<br>"Pago" pra Tríade (pra você mesmo): ${brl(S.paid)}<br>Sacos abertos: ${fmt(S.sackCount)}`;
     $('#ending').classList.remove('hidden');
     $('#fade').classList.remove('on', 'white');
-    clearSave();
+  }
+
+  function startAct2() {
+    Sfx.init();
+    Sfx.drone(false); Sfx.radio(false); Sfx.ring(false); Sfx.rain(0);
+    $('#ending').classList.add('hidden');
+    $('#title').classList.add('hidden');
+    $('#hud').classList.add('hidden');
+    phase = 'act2';
+    Act2.start(S.act2 || { stage: 'balsa1' });
   }
 
   // ---------------------------------------------------------------
@@ -730,11 +744,12 @@
   // ---------------------------------------------------------------
   // entrada
   // ---------------------------------------------------------------
+  let lastConsumed = 0;
   function primaryAction(x, y, pickName) {
     Sfx.init();
-    if (skipResolve) { skipResolve(); return; }
-    if (phoneResolve) { phoneResolve(); return; }
-    if (dlg) { advanceDialog(); return; }
+    if (skipResolve) { lastConsumed = performance.now(); skipResolve(); return; }
+    if (phoneResolve) { lastConsumed = performance.now(); phoneResolve(); return; }
+    if (dlg) { lastConsumed = performance.now(); advanceDialog(); return; }
     if (tapeUI) return;
     if (phase !== 'play' && phase !== 'final') return;
     if (pickName === 'boombox' && phase === 'play') {
@@ -790,7 +805,8 @@
   $('#sleepBtn').addEventListener('click', () => { if (phase === 'play' && dayTapesDone()) night(true); });
   $('#btnNew').addEventListener('click', () => { Sfx.init(); newGame(); });
   $('#btnCont').addEventListener('click', () => { Sfx.init(); continueGame(); });
-  $('#btnAgain').addEventListener('click', () => { location.reload(); });
+  $('#btnAgain').addEventListener('click', () => { clearSave(); location.reload(); });
+  $('#btnAct2').addEventListener('click', startAct2);
   $('#muteBtn').addEventListener('click', toggleMute);
   $('#btnTapes').addEventListener('click', () => { $('#leftCol').classList.toggle('open'); $('#shop').classList.remove('open'); $('#btnTapes').classList.remove('flash'); });
   $('#btnShop').addEventListener('click', () => { $('#shop').classList.toggle('open'); $('#leftCol').classList.remove('open'); });
@@ -843,6 +859,13 @@
   function frame(t) {
     const dt = Math.min(0.1, (t - last) / 1000);
     last = t;
+    if (Act2.isActive()) {
+      updateDialog(dt);
+      Act2.update(dt);
+      Act2.render();
+      requestAnimationFrame(frame);
+      return;
+    }
     update(dt);
     const tapeReady = S.tapes.some((x) => !x.heard);
     World.update(dt, { auto: phase === 'play' && gps() > 0, tapeReady });
@@ -853,11 +876,29 @@
   // ---------------------------------------------------------------
   // boot
   // ---------------------------------------------------------------
+  // ponte pro Ato II (act2.js) usar os diálogos, telas e o save do jogo
+  window.GameUI = {
+    dialog, storyLines, fade, toast, setHint, wait, waitOrClick, fmt, brl, save, clearSave,
+    S: () => S,
+    busy: () => !!(dlg || skipResolve || phoneResolve),
+    consumedAt: () => lastConsumed,
+    setPhase: (p) => { phase = p; },
+    skip: () => { if (skipResolve) skipResolve(); },
+  };
+
   World.init(canvas);
   if (hasSave()) {
     $('#btnCont').classList.remove('hidden');
-    $('#memCard').textContent = 'MEMORY CARD (8MB) no SLOT 1: "ARROZ DOURADO" — 1 save encontrado';
+    let act2 = false;
+    try { act2 = !!JSON.parse(localStorage.getItem(SAVE_KEY)).flags.act1Done; } catch (e) { /* save antigo */ }
+    $('#memCard').textContent = act2 ? 'MEMORY CARD (8MB) no SLOT 1: "ARROZ DOURADO" — ATO II' : 'MEMORY CARD (8MB) no SLOT 1: "ARROZ DOURADO" — 1 save encontrado';
   }
   requestAnimationFrame(frame);
-  if (DEBUG) window.__S = () => S;
+  if (DEBUG) {
+    window.__S = () => S;
+    window.__A2DEBUG = true;
+    // ?debug&act2=balsa1|mansion|boss1|post1|boss2|final pula direto pra uma parte do ato II
+    const m = location.search.match(/act2=(\w+)/);
+    if (m) { S.flags.act1Done = true; S.act2 = { stage: m[1] }; startAct2(); }
+  }
 })();
