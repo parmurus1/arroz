@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Arroz Dourado</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <canvas id="c"></canvas>
+
+  <!-- ===================== HUD ===================== -->
+  <div id="hud" class="hidden">
+    <div id="top">
+      <div class="panel" id="dayPanel">
+        <div class="lbl" id="dayName">SEXTA 20/11</div>
+        <div class="sub" id="dayTag">FERIADO</div>
+        <div class="big" id="clock">07:00</div>
+        <div class="sub" id="parcela">PARCELA ÀS 22H: R$ 3.000</div>
+      </div>
+      <div class="panel" id="countPanel">
+        <div class="lbl">GRÃOS CONTADOS · 已数</div>
+        <div class="huge" id="grains">0</div>
+        <div class="sub"><span id="perClick">1</span> por clique · <span id="perSec">0</span>/s</div>
+        <div id="sackName" class="sub">SACO #1</div>
+        <div class="bar"><div id="sackBar"></div></div>
+      </div>
+      <div class="panel" id="moneyPanel">
+        <div class="lbl">BOLSO</div>
+        <div class="big gold" id="money">R$ 0</div>
+        <div class="sub red">DÍVIDA C/ TRÍADE</div>
+        <div class="debt" id="debt">R$ 10.000.000</div>
+      </div>
+    </div>
+
+    <div id="leftCol">
+      <div class="panel" id="badge">
+        <div class="clip"></div>
+        <div class="badge-co">ARROZ DRAGÃO DOURADO · 金龙米</div>
+        <div class="badge-l">FUNCIONÁRIO:</div>
+        <div class="badge-name" id="badgeName">ZÉ</div>
+      </div>
+      <div class="panel hidden" id="memPanel">
+        <div class="lbl" id="memLabel">???</div>
+        <div class="bar mem"><div id="memBar"></div></div>
+        <div class="sub" id="memPct">0%</div>
+      </div>
+      <div class="panel" id="tapesPanel">
+        <div class="title">📼 FITAS · 磁带</div>
+        <div id="tapesList"><div class="empty">Nenhuma fita... ainda.</div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="shop">
+      <div class="title">🛒 CAMELÓDROMO DA URUGUAIANA</div>
+      <div class="sub center">entrega na hora via motoboy</div>
+      <div id="shopList"></div>
+    </div>
+
+    <div id="toasts"></div>
+    <div id="hint"></div>
+    <button id="sleepBtn" class="hidden">🛏 DORMIR NO QUARTINHO DOS FUNDOS</button>
+    <div id="ticker"><div id="tickerLbl">📰 JORNAL DE ONTEM</div><div id="tickerWrap"><span id="tickerText"></span></div></div>
+    <div id="mobileBtns"><button id="btnTapes">📼</button><button id="btnShop">🛒</button></div>
+    <button id="muteBtn" title="Som (M)">🔊</button>
+  </div>
+
+  <!-- ===================== DIÁLOGO ===================== -->
+  <div id="dialog" class="hidden">
+    <div id="dlgWho">CHEFE</div>
+    <div id="dlgText"></div>
+    <div id="dlgNext">▼</div>
+  </div>
+
+  <!-- ===================== TOCA-FITAS ===================== -->
+  <div id="tape" class="hidden">
+    <div class="tape-box panel">
+      <div class="tape-head"><span id="tapeNum">FITA #1</span> — <span id="tapeTitle">???</span></div>
+      <div class="cassette">
+        <div class="cas-label" id="casLabel">磁带 一</div>
+        <div class="cas-window"><div class="reel l"></div><div class="reel r"></div></div>
+      </div>
+      <div class="tape-speaker" id="tapeSpeaker">VOZ DE VELHO</div>
+      <div class="tape-cn" id="tapeCn"></div>
+      <div class="tape-pt" id="tapePt"></div>
+      <div class="tape-hint" id="tapeHint"></div>
+      <div class="tape-btns"><button id="tapeEject">⏏ EJETAR</button></div>
+    </div>
+  </div>
+
+  <!-- ===================== TELAS ===================== -->
+  <div id="fade"></div>
+  <div id="story" class="hidden"></div>
+  <div id="bigText" class="hidden"><div class="bt-cn" id="btCn"></div><div class="bt-pt" id="btPt"></div></div>
+
+  <div id="title">
+    <div class="t-top">JINLONG SOFT apresenta</div>
+    <div class="t-logo">ARROZ<br>DOURADO</div>
+    <div class="t-cn">金 米</div>
+    <div class="t-sub">um grão de cada vez · 一粒一粒</div>
+    <div class="t-menu">
+      <button id="btnNew">NOVO JOGO</button>
+      <button id="btnCont" class="hidden">CONTINUAR</button>
+    </div>
+    <div class="t-press">PRESSIONE START</div>
+    <div class="t-card" id="memCard">MEMORY CARD (8MB) no SLOT 1: nenhum dado</div>
+    <div class="t-foot">© 2026 JINLONG SOFT · RIO DE JANEIRO · use fone 🎧</div>
+  </div>
+
+  <div id="ending" class="hidden">
+    <div class="e-cn">黄金龙</div>
+    <div class="e-ks">KING SIZE</div>
+    <div class="e-sub">O REI DE TODOS OS REIS</div>
+    <div class="e-stats" id="eStats"></div>
+    <div class="e-next">CONTINUA EM...<br><b>ARROZ DOURADO 2: A VINGANÇA DO REI COBRA</b></div>
+    <button id="btnAgain">JOGAR DE NOVO</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/world.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
